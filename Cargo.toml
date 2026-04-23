@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["bounkyokth@hotmail.com"]
 description = "help you crate log file on your project easier and also format the log output"
 license = "MIT OR Apache-2.0"
-repository = "git@github.com:GIOKTH/ez-logking.git"
+repository = "https://github.com/GIOKTH/ez-logking.git"
 
 [dependencies]
 tracing = "0.1"
