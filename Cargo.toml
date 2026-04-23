@@ -2,6 +2,8 @@
 name = "ez_logking"
 version = "0.1.0"
 edition = "2021"
+authors = ["bounkyokth@hotmail.com"]
+repository = "git@github.com:GIOKTH/ez-logking.git"
 
 [dependencies]
 tracing = "0.1"
