@@ -34,7 +34,9 @@ where
         if let Some(scope) = ctx.lookup_current() {
             for span in scope.scope() {
                 let extensions = span.extensions();
-                if let Some(fields) = extensions.get::<tracing_subscriber::fmt::FormattedFields<S>>() {
+                if let Some(fields) =
+                    extensions.get::<tracing_subscriber::fmt::FormattedFields<S>>()
+                {
                     // ດຶງຂໍ້ມູນຈາກ fields ທີ່ຖືກ format ໄວ້ແລ້ວ
                     if !fields.is_empty() {
                         // ໃນບົດນີ້ເຮົາຈະໃຊ້ visitor ຜ່ານ span metadata ຖ້າຕ້ອງການຄວາມຊັດເຈນ
@@ -43,21 +45,30 @@ where
                 // ວິທີທີ່ແນ່ນອນທີ່ສຸດ: ດຶງຈາກ field ໂດຍກົງ
                 let mut visitor = TraceIdVisitor("N/A".into());
                 event.record(&mut visitor);
-                if visitor.0 != "N/A" { trace_id = visitor.0; }
+                if visitor.0 != "N/A" {
+                    trace_id = visitor.0;
+                }
             }
         }
 
         // ສ້າງ Header ສວຍໆແບບ Log4j
         print!(
             "[{}] {:<5} [{}] [TID:{}] [{}:{}] - ",
-            timestamp, metadata.level(), self.app_name, trace_id, file_name, metadata.line().unwrap_or(0)
+            timestamp,
+            metadata.level(),
+            self.app_name,
+            trace_id,
+            file_name,
+            metadata.line().unwrap_or(0)
         );
 
         // ດຶງ Message ຂອງ Log
         struct MsgVisitor;
         impl tracing::field::Visit for MsgVisitor {
             fn record_debug(&mut self, field: &tracing::field::Field, value: &dyn std::fmt::Debug) {
-                if field.name() == "message" { print!("{:?}", value); }
+                if field.name() == "message" {
+                    print!("{:?}", value);
+                }
             }
         }
         let mut msg_visitor = MsgVisitor;
@@ -82,10 +93,11 @@ pub fn init_logger(app_name: &str) -> tracing_appender::non_blocking::WorkerGuar
         .build(log_dir)
         .expect("Failed to create rolling file appender");
 
-    let (non_blocking_writer, guard) = tracing_appender::non_blocking::NonBlockingBuilder::default()
-        .lossy(false)
-        .buffered_lines_limit(10_000)
-        .finish(file_appender);
+    let (non_blocking_writer, guard) =
+        tracing_appender::non_blocking::NonBlockingBuilder::default()
+            .lossy(false)
+            .buffered_lines_limit(10_000)
+            .finish(file_appender);
 
     // --- ສ່ວນທີ່ເຫຼືອຄືເກົ່າ ---
     let filter = tracing_subscriber::EnvFilter::from_default_env()
@@ -93,11 +105,15 @@ pub fn init_logger(app_name: &str) -> tracing_appender::non_blocking::WorkerGuar
 
     tracing_subscriber::registry()
         .with(filter)
-        .with(DevFormatter { app_name: app_name.to_string() })
-        .with(tracing_subscriber::fmt::layer()
-            .json()
-            .with_writer(non_blocking_writer)
-            .with_current_span(true))
+        .with(DevFormatter {
+            app_name: app_name.to_string(),
+        })
+        .with(
+            tracing_subscriber::fmt::layer()
+                .json()
+                .with_writer(non_blocking_writer)
+                .with_current_span(true),
+        )
         .init();
 
     guard
